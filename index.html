@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AuctionOS — Finance Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1B2A;
+    --navy-mid: #162235;
+    --navy-light: #1E2F45;
+    --navy-hover: #243650;
+    --amber: #F5A623;
+    --amber-light: #FBBF24;
+    --amber-dim: rgba(245,166,35,0.12);
+    --blue: #3B82F6;
+    --blue-dim: rgba(59,130,246,0.12);
+    --green: #10B981;
+    --green-dim: rgba(16,185,129,0.1);
+    --red: #EF4444;
+    --red-dim: rgba(239,68,68,0.1);
+    --yellow: #F59E0B;
+    --yellow-dim: rgba(245,158,11,0.1);
+    --text-primary: #F0F4F8;
+    --text-secondary: #8BA0B8;
+    --text-muted: #4A6278;
+    --border: rgba(255,255,255,0.07);
+    --border-med: rgba(255,255,255,0.12);
+    --card: #162235;
+    --card-hover: #1E2F45;
+    --sidebar-w: 256px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; overflow:hidden; }
+  body { font-family:'DM Sans', sans-serif; background:var(--navy); color:var(--text-primary); display:flex; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width:var(--sidebar-w); min-width:var(--sidebar-w);
+    background:var(--navy-mid);
+    border-right:1px solid var(--border);
+    display:flex; flex-direction:column;
+    overflow-y:auto; z-index:10;
+  }
+  .sidebar::-webkit-scrollbar { width:4px; }
+  .sidebar::-webkit-scrollbar-thumb { background:var(--navy-hover); border-radius:2px; }
+  .brand {
+    padding:20px 20px 16px;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .brand-logo { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .brand-icon {
+    width:34px; height:34px; background:var(--amber);
+    border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font-size:16px; font-weight:700; color:var(--navy); flex-shrink:0;
+  }
+  .brand-name { font-size:15px; font-weight:700; color:var(--text-primary); letter-spacing:.3px; }
+  .brand-tag { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
+  .persona-chip {
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--amber-dim); border:1px solid rgba(245,166,35,.25);
+    border-radius:20px; padding:5px 10px; font-size:11px; color:var(--amber);
+    font-weight:600; letter-spacing:.3px;
+  }
+  .persona-chip span { width:6px; height:6px; background:var(--amber); border-radius:50%; display:inline-block; }
+  .nav-section { padding:12px 12px 4px; }
+  .nav-label { font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.2px; padding:0 8px 6px; }
+  .nav-item {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 10px; border-radius:8px; cursor:pointer;
+    font-size:12.5px; color:var(--text-secondary); font-weight:500;
+    transition:all .15s; margin-bottom:1px; position:relative;
+  }
+  .nav-item:hover { background:var(--navy-hover); color:var(--text-primary); }
+  .nav-item.active { background:var(--amber-dim); color:var(--amber); border:1px solid rgba(245,166,35,.18); }
+  .nav-item.active .nav-icon { color:var(--amber); }
+  .nav-icon { width:16px; font-size:14px; text-align:center; flex-shrink:0; }
+  .nav-badge {
+    margin-left:auto; background:var(--red); color:#fff;
+    font-size:9px; font-weight:700; padding:2px 5px; border-radius:10px; min-width:18px; text-align:center;
+  }
+  .nav-badge.amber { background:var(--amber); color:var(--navy); }
+  .nav-badge.green { background:var(--green); color:#fff; }
+  .sidebar-footer {
+    margin-top:auto; padding:14px; border-top:1px solid var(--border); flex-shrink:0;
+  }
+  .user-pill { display:flex; align-items:center; gap:10px; }
+  .user-avatar {
+    width:32px; height:32px; border-radius:50%;
+    background:linear-gradient(135deg,#3B82F6,#8B5CF6);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:#fff; flex-shrink:0;
+  }
+  .user-name { font-size:12px; font-weight:600; color:var(--text-primary); }
+  .user-role { font-size:10px; color:var(--text-muted); }
+
+  /* MAIN */
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .topbar {
+    height:56px; background:var(--navy-mid); border-bottom:1px solid var(--border);
+    display:flex; align-items:center; padding:0 24px; gap:16px; flex-shrink:0;
+  }
+  .topbar-title { font-size:15px; font-weight:600; color:var(--text-primary); }
+  .topbar-sub { font-size:12px; color:var(--text-muted); margin-left:4px; }
+  .topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+  .tb-btn {
+    height:32px; padding:0 14px; border-radius:8px; border:1px solid var(--border-med);
+    background:transparent; color:var(--text-secondary); font-size:12px; font-family:'DM Sans',sans-serif;
+    cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:6px;
+  }
+  .tb-btn:hover { background:var(--navy-hover); color:var(--text-primary); }
+  .tb-btn.primary { background:var(--amber); color:var(--navy); border-color:var(--amber); font-weight:600; }
+  .tb-btn.primary:hover { background:var(--amber-light); }
+  .notif-dot {
+    width:32px; height:32px; border-radius:8px; border:1px solid var(--border-med);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative;
+    color:var(--text-secondary); font-size:16px; transition:all .15s;
+  }
+  .notif-dot:hover { background:var(--navy-hover); color:var(--text-primary); }
+  .notif-dot::after {
+    content:''; width:7px; height:7px; background:var(--red); border-radius:50%;
+    position:absolute; top:5px; right:5px; border:2px solid var(--navy-mid);
+  }
+
+  /* CONTENT */
+  .content { flex:1; overflow-y:auto; padding:24px; }
+  .content::-webkit-scrollbar { width:6px; }
+  .content::-webkit-scrollbar-thumb { background:var(--navy-hover); border-radius:3px; }
+
+  /* SCREENS */
+  .screen { display:none; }
+  .screen.active { display:block; }
+
+  /* PAGE HEADER */
+  .page-header { margin-bottom:24px; }
+  .page-header h1 { font-family:'DM Serif Display', serif; font-size:24px; color:var(--text-primary); margin-bottom:4px; }
+  .page-header p { font-size:13px; color:var(--text-muted); }
+  .breadcrumb { font-size:11px; color:var(--text-muted); margin-bottom:8px; }
+  .breadcrumb span { color:var(--amber); }
+
+  /* TABS */
+  .tabs { display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:24px; }
+  .tab {
+    padding:10px 16px; font-size:12.5px; font-weight:500; color:var(--text-secondary);
+    cursor:pointer; border-bottom:2px solid transparent; transition:all .15s; margin-bottom:-1px;
+  }
+  .tab:hover { color:var(--text-primary); }
+  .tab.active { color:var(--amber); border-bottom-color:var(--amber); }
+
+  /* STAT CARDS */
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+  .stats-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+  .stat-card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 20px;
+    transition:all .2s; cursor:default;
+  }
+  .stat-card:hover { border-color:var(--border-med); background:var(--card-hover); }
+  .stat-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+  .stat-value { font-size:24px; font-weight:700; color:var(--text-primary); margin-bottom:6px; letter-spacing:-.5px; }
+  .stat-delta { font-size:11px; display:flex; align-items:center; gap:4px; }
+  .stat-delta.up { color:var(--green); }
+  .stat-delta.down { color:var(--red); }
+  .stat-delta.neutral { color:var(--text-muted); }
+  .stat-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .si-amber { background:var(--amber-dim); color:var(--amber); }
+  .si-blue { background:var(--blue-dim); color:var(--blue); }
+  .si-green { background:var(--green-dim); color:var(--green); }
+  .si-red { background:var(--red-dim); color:var(--red); }
+
+  /* CARDS */
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:20px; }
+  .card-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .card-title { font-size:13px; font-weight:600; color:var(--text-primary); }
+  .card-body { padding:20px; }
+  .card-action { font-size:11px; color:var(--amber); cursor:pointer; font-weight:500; }
+  .card-action:hover { text-decoration:underline; }
+
+  /* TABLE */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  thead th { padding:10px 14px; text-align:left; color:var(--text-muted); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.7px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  tbody td { padding:12px 14px; border-bottom:1px solid var(--border); color:var(--text-secondary); vertical-align:middle; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr:hover td { background:var(--navy-hover); color:var(--text-primary); }
+  .td-bold { color:var(--text-primary) !important; font-weight:600; }
+
+  /* BADGES */
+  .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap; }
+  .badge::before { content:''; width:5px; height:5px; border-radius:50%; }
+  .badge-green { background:var(--green-dim); color:var(--green); border:1px solid rgba(16,185,129,.2); }
+  .badge-green::before { background:var(--green); }
+  .badge-red { background:var(--red-dim); color:var(--red); border:1px solid rgba(239,68,68,.2); }
+  .badge-red::before { background:var(--red); }
+  .badge-yellow { background:var(--yellow-dim); color:var(--yellow); border:1px solid rgba(245,158,11,.2); }
+  .badge-yellow::before { background:var(--yellow); }
+  .badge-blue { background:var(--blue-dim); color:var(--blue); border:1px solid rgba(59,130,246,.2); }
+  .badge-blue::before { background:var(--blue); }
+  .badge-muted { background:rgba(255,255,255,.05); color:var(--text-muted); border:1px solid var(--border); }
+  .badge-muted::before { background:var(--text-muted); }
+  .badge-amber { background:var(--amber-dim); color:var(--amber); border:1px solid rgba(245,166,35,.2); }
+  .badge-amber::before { background:var(--amber); }
+
+  /* GRIDS */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; }
+
+  /* FILTERS */
+  .filter-bar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+  .filter-input {
+    height:34px; padding:0 12px; background:var(--navy-light); border:1px solid var(--border);
+    border-radius:8px; color:var(--text-primary); font-size:12.5px; font-family:'DM Sans',sans-serif;
+    outline:none; width:220px;
+  }
+  .filter-input:focus { border-color:var(--amber); }
+  .filter-select {
+    height:34px; padding:0 28px 0 12px; background:var(--navy-light); border:1px solid var(--border);
+    border-radius:8px; color:var(--text-secondary); font-size:12px; font-family:'DM Sans',sans-serif;
+    outline:none; cursor:pointer; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238BA0B8'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 10px center;
+  }
+  .filter-select:focus { border-color:var(--amber); outline:none; }
+
+  /* QUICK ACTIONS */
+  .quick-actions { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:24px; }
+  .qa-btn {
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:16px 10px; text-align:center; cursor:pointer; transition:all .18s;
+  }
+  .qa-btn:hover { border-color:var(--amber); background:var(--amber-dim); transform:translateY(-1px); }
+  .qa-icon { font-size:22px; margin-bottom:8px; }
+  .qa-label { font-size:11px; color:var(--text-secondary); font-weight:500; line-height:1.3; }
+
+  /* ALERTS */
+  .alert { display:flex; align-items:flex-start; gap:12px; padding:12px 16px; border-radius:10px; margin-bottom:10px; font-size:12.5px; }
+  .alert-red { background:var(--red-dim); border:1px solid rgba(239,68,68,.2); color:var(--red); }
+  .alert-yellow { background:var(--yellow-dim); border:1px solid rgba(245,158,11,.2); color:var(--yellow); }
+  .alert-green { background:var(--green-dim); border:1px solid rgba(16,185,129,.2); color:var(--green); }
+  .alert-blue { background:var(--blue-dim); border:1px solid rgba(59,130,246,.2); color:var(--blue); }
+  .alert-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+  .alert-body strong { display:block; font-weight:700; margin-bottom:2px; }
+
+  /* TIMELINE */
+  .timeline { padding:0; list-style:none; }
+  .tl-item { display:flex; gap:14px; padding-bottom:18px; position:relative; }
+  .tl-item:last-child { padding-bottom:0; }
+  .tl-item:not(:last-child)::before { content:''; position:absolute; left:9px; top:22px; bottom:0; width:2px; background:var(--border); }
+  .tl-dot { width:20px; height:20px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; margin-top:2px; }
+  .tl-dot-green { background:var(--green-dim); color:var(--green); border:2px solid var(--green); }
+  .tl-dot-amber { background:var(--amber-dim); color:var(--amber); border:2px solid var(--amber); }
+  .tl-dot-blue { background:var(--blue-dim); color:var(--blue); border:2px solid var(--blue); }
+  .tl-dot-red { background:var(--red-dim); color:var(--red); border:2px solid var(--red); }
+  .tl-content p { font-size:12.5px; color:var(--text-primary); font-weight:500; }
+  .tl-content small { font-size:11px; color:var(--text-muted); }
+
+  /* CALENDAR */
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .cal-day-hdr { text-align:center; font-size:10px; color:var(--text-muted); font-weight:700; padding:6px 0; text-transform:uppercase; }
+  .cal-day {
+    aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    border-radius:8px; cursor:pointer; position:relative; font-size:12px; color:var(--text-secondary);
+    transition:all .15s;
+  }
+  .cal-day:hover { background:var(--navy-hover); color:var(--text-primary); }
+  .cal-day.today { background:var(--amber-dim); color:var(--amber); font-weight:700; border:1px solid rgba(245,166,35,.3); }
+  .cal-day.has-event::after { content:''; width:4px; height:4px; background:var(--amber); border-radius:50%; position:absolute; bottom:4px; }
+  .cal-day.other-month { opacity:.3; }
+  .cal-day.event-day { background:var(--blue-dim); color:var(--blue); }
+
+  /* PROGRESS */
+  .progress-bar { height:6px; background:var(--navy-light); border-radius:3px; overflow:hidden; margin-top:6px; }
+  .progress-fill { height:100%; border-radius:3px; transition:width .5s; }
+  .pf-amber { background:var(--amber); }
+  .pf-green { background:var(--green); }
+  .pf-blue { background:var(--blue); }
+  .pf-red { background:var(--red); }
+
+  /* CHART BAR */
+  .bar-chart { display:flex; align-items:flex-end; gap:6px; height:80px; }
+  .bar { flex:1; border-radius:4px 4px 0 0; min-height:4px; transition:all .3s; cursor:pointer; }
+  .bar:hover { opacity:.85; }
+  .bar-labels { display:flex; gap:6px; margin-top:6px; }
+  .bar-label { flex:1; text-align:center; font-size:9px; color:var(--text-muted); }
+
+  /* MINI CHART */
+  .sparkline { display:flex; align-items:flex-end; gap:3px; height:40px; }
+  .spark-bar { flex:1; border-radius:2px; min-height:3px; }
+
+  /* SECTION DIVIDER */
+  .sec-divider { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); padding:16px 0 10px; border-top:1px solid var(--border); margin-top:4px; }
+
+  /* ACTION ICONS IN TABLE */
+  .tbl-actions { display:flex; gap:6px; }
+  .tbl-action {
+    width:26px; height:26px; border-radius:6px; background:var(--navy-light); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px;
+    color:var(--text-muted); transition:all .15s;
+  }
+  .tbl-action:hover { background:var(--amber-dim); border-color:var(--amber); color:var(--amber); }
+  .tbl-action.red:hover { background:var(--red-dim); border-color:var(--red); color:var(--red); }
+
+  /* EMPTY STATE */
+  .empty-state { text-align:center; padding:48px; color:var(--text-muted); }
+  .empty-state .es-icon { font-size:40px; margin-bottom:14px; opacity:.4; }
+  .empty-state p { font-size:13px; }
+
+  /* FORM ELEMENTS */
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
+  .form-label { font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:.6px; }
+  .form-input {
+    height:36px; padding:0 12px; background:var(--navy-light); border:1px solid var(--border);
+    border-radius:8px; color:var(--text-primary); font-size:13px; font-family:'DM Sans',sans-serif; outline:none;
+  }
+  .form-input:focus { border-color:var(--amber); }
+
+  /* DONUT PLACEHOLDER */
+  .donut-wrap { display:flex; align-items:center; gap:24px; }
+  .donut { width:90px; height:90px; border-radius:50%; flex-shrink:0;
+    background:conic-gradient(var(--green) 0% 42%, var(--amber) 42% 65%, var(--blue) 65% 82%, var(--red) 82% 100%);
+    display:flex; align-items:center; justify-content:center; }
+  .donut-inner { width:60px; height:60px; background:var(--card); border-radius:50%; }
+  .legend-item { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; color:var(--text-secondary); }
+  .legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+  /* TOOLTIP / hover card */
+  .info-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:12.5px; }
+  .info-row:last-child { border-bottom:none; }
+  .info-key { color:var(--text-muted); }
+  .info-val { color:var(--text-primary); font-weight:600; }
+
+  /* RESPONSIVE */
+  @media(max-width:1200px) {
+    .stats-grid { grid-template-columns:repeat(2,1fr); }
+    .quick-actions { grid-template-columns:repeat(3,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-logo">
+      <div class="brand-icon">A</div>
+      <div>
+        <div class="brand-name">AuctionOS</div>
+        <div class="brand-tag">Finance Portal</div>
+      </div>
+    </div>
+    <div class="persona-chip"><span></span> Finance Manager</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <div class="nav-item active" onclick="showScreen('dashboard')">
+      <span class="nav-icon">⊞</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showScreen('calendar')">
+      <span class="nav-icon">📅</span> My Calendar
+      <span class="nav-badge amber">7</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">EMD Management</div>
+    <div class="nav-item" onclick="showScreen('emd-refund')">
+      <span class="nav-icon">↩</span> EMD Refunds
+      <span class="nav-badge">12</span>
+    </div>
+    <div class="nav-item" onclick="showScreen('emd-tracking')">
+      <span class="nav-icon">📌</span> EMD Tracking
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Revenue & Billing</div>
+    <div class="nav-item" onclick="showScreen('subscription')">
+      <span class="nav-icon">♻</span> Subscription Mgmt
+    </div>
+    <div class="nav-item" onclick="showScreen('advertisement')">
+      <span class="nav-icon">📣</span> Advertisement Mgmt
+    </div>
+    <div class="nav-item" onclick="showScreen('transactions')">
+      <span class="nav-icon">⇄</span> Transactions
+    </div>
+    <div class="nav-item" onclick="showScreen('invoices')">
+      <span class="nav-icon">🧾</span> Invoice Management
+      <span class="nav-badge">5</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Users & Disputes</div>
+    <div class="nav-item" onclick="showScreen('users')">
+      <span class="nav-icon">👥</span> User Management
+    </div>
+    <div class="nav-item" onclick="showScreen('disputes')">
+      <span class="nav-icon">⚖</span> Dispute Resolution
+      <span class="nav-badge">3</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Intelligence</div>
+    <div class="nav-item" onclick="showScreen('reports')">
+      <span class="nav-icon">📊</span> Reports & MIS
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="user-avatar">PR</div>
+      <div>
+        <div class="user-name">Priya Rajkumar</div>
+        <div class="user-role">Finance Manager</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <span class="topbar-title" id="topbar-title">Dashboard</span>
+      <span class="topbar-sub" id="topbar-sub">— April 2026 Overview</span>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-btn">⬇ Export</button>
+      <button class="tb-btn">📅 Apr 2026 ▾</button>
+      <div class="notif-dot">🔔</div>
+      <button class="tb-btn primary">+ New Action</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══════════════════════════════ DASHBOARD ═══════════════════════════════ -->
+    <div id="screen-dashboard" class="screen active">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ Dashboard</span></div>
+        <h1>Good morning, Priya 👋</h1>
+        <p>Here's your financial overview for today — Wednesday, 1 April 2026</p>
+      </div>
+
+      <!-- Alerts -->
+      <div class="alert alert-red"><span class="alert-icon">⚠</span><div class="alert-body"><strong>12 EMD Refunds Pending</strong> Oldest request is 4 days overdue. Immediate action required.</div></div>
+      <div class="alert alert-yellow" style="margin-bottom:20px;"><span class="alert-icon">⏰</span><div class="alert-body"><strong>3 Subscriptions Expiring</strong> RajSteel Pvt Ltd, Bharat Alloys, MetalCraft Inc. expire within 7 days.</div></div>
+
+      <!-- KPI Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Revenue (MTD)<div class="stat-icon si-amber">₹</div></div>
+          <div class="stat-value">₹1.84 Cr</div>
+          <div class="stat-delta up">▲ 14.2% vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">EMD Holdings<div class="stat-icon si-blue">🔒</div></div>
+          <div class="stat-value">₹6.32 Cr</div>
+          <div class="stat-delta neutral">— 247 active auctions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Refunds<div class="stat-icon si-red">↩</div></div>
+          <div class="stat-value">₹28.4 L</div>
+          <div class="stat-delta down">▼ 12 requests queued</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Overdue Invoices<div class="stat-icon si-amber">🧾</div></div>
+          <div class="stat-value">₹9.7 L</div>
+          <div class="stat-delta down">▼ 5 invoices overdue</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="sec-divider">Quick Actions</div>
+      <div class="quick-actions">
+        <div class="qa-btn" onclick="showScreen('emd-refund')"><div class="qa-icon">↩</div><div class="qa-label">Process Refund</div></div>
+        <div class="qa-btn" onclick="showScreen('invoices')"><div class="qa-icon">🧾</div><div class="qa-label">Raise Invoice</div></div>
+        <div class="qa-btn" onclick="showScreen('disputes')"><div class="qa-icon">⚖</div><div class="qa-label">Review Disputes</div></div>
+        <div class="qa-btn" onclick="showScreen('emd-tracking')"><div class="qa-icon">📌</div><div class="qa-label">EMD Status</div></div>
+        <div class="qa-btn" onclick="showScreen('reports')"><div class="qa-icon">📊</div><div class="qa-label">Generate MIS</div></div>
+        <div class="qa-btn" onclick="showScreen('transactions')"><div class="qa-icon">⇄</div><div class="qa-label">Reconcile Txns</div></div>
+      </div>
+
+      <div class="two-col">
+        <!-- Revenue Chart -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Monthly Revenue Trend</span>
+            <span class="card-action">View Report →</span>
+          </div>
+          <div class="card-body">
+            <div class="bar-chart">
+              <div class="bar pf-amber" style="height:45%;background:var(--text-muted);opacity:.4;"></div>
+              <div class="bar" style="height:55%;background:var(--text-muted);opacity:.4;"></div>
+              <div class="bar" style="height:62%;background:var(--text-muted);opacity:.4;"></div>
+              <div class="bar" style="height:50%;background:var(--text-muted);opacity:.4;"></div>
+              <div class="bar" style="height:70%;background:var(--amber);opacity:.5;"></div>
+              <div class="bar" style="height:58%;background:var(--amber);opacity:.5;"></div>
+              <div class="bar" style="height:80%;background:var(--amber);opacity:.6;"></div>
+              <div class="bar" style="height:68%;background:var(--amber);opacity:.6;"></div>
+              <div class="bar" style="height:88%;background:var(--amber);opacity:.7;"></div>
+              <div class="bar" style="height:74%;background:var(--amber);opacity:.8;"></div>
+              <div class="bar" style="height:95%;background:var(--amber);opacity:.9;"></div>
+              <div class="bar" style="height:100%;background:var(--amber);border:2px solid var(--amber-light);"></div>
+            </div>
+            <div class="bar-labels">
+              <div class="bar-label">May</div><div class="bar-label">Jun</div><div class="bar-label">Jul</div><div class="bar-label">Aug</div><div class="bar-label">Sep</div><div class="bar-label">Oct</div><div class="bar-label">Nov</div><div class="bar-label">Dec</div><div class="bar-label">Jan</div><div class="bar-label">Feb</div><div class="bar-label">Mar</div><div class="bar-label">Apr</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Breakdown -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Revenue Breakdown</span>
+            <span class="badge badge-green">Live</span>
+          </div>
+          <div class="card-body">
+            <div class="donut-wrap">
+              <div class="donut"><div class="donut-inner"></div></div>
+              <div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Subscription Fees — 42%</div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Transaction Commission — 23%</div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Advertisement Revenue — 17%</div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> EMD Forfeiture — 18%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions + Activity -->
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Transactions</span>
+            <span class="card-action" onclick="showScreen('transactions')">View All →</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Party</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td class="td-bold">TXN-9847</td><td>RajSteel Pvt Ltd</td><td>EMD Deposit</td><td class="td-bold">₹5,00,000</td><td><span class="badge badge-green">Settled</span></td></tr>
+                <tr><td class="td-bold">TXN-9846</td><td>Bharat Alloys</td><td>Subscription</td><td class="td-bold">₹1,20,000</td><td><span class="badge badge-green">Settled</span></td></tr>
+                <tr><td class="td-bold">TXN-9845</td><td>IndoChem Corp</td><td>Commission</td><td class="td-bold">₹84,500</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+                <tr><td class="td-bold">TXN-9844</td><td>MetalCraft Inc</td><td>Ad Payment</td><td class="td-bold">₹22,000</td><td><span class="badge badge-green">Settled</span></td></tr>
+                <tr><td class="td-bold">TXN-9843</td><td>SteelVault Ltd</td><td>EMD Refund</td><td class="td-bold">₹3,50,000</td><td><span class="badge badge-red">Failed</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">Activity Feed</span></div>
+          <div class="card-body">
+            <ul class="timeline">
+              <li class="tl-item"><div class="tl-dot tl-dot-red">!</div><div class="tl-content"><p>EMD Refund failed — SteelVault Ltd</p><small>10 mins ago · TXN-9843</small></div></li>
+              <li class="tl-item"><div class="tl-dot tl-dot-green">✓</div><div class="tl-content"><p>Invoice INV-2041 marked as paid</p><small>42 mins ago · MetalCraft Inc</small></div></li>
+              <li class="tl-item"><div class="tl-dot tl-dot-amber">★</div><div class="tl-content"><p>New dispute raised — AUC-4872</p><small>2 hrs ago · IndoChem Corp</small></div></li>
+              <li class="tl-item"><div class="tl-dot tl-dot-blue">i</div><div class="tl-content"><p>Subscription renewed — Bharat Alloys</p><small>3 hrs ago · ₹1,20,000</small></div></li>
+              <li class="tl-item"><div class="tl-dot tl-dot-green">✓</div><div class="tl-content"><p>EMD released — Auction AUC-4869 closed</p><small>5 hrs ago · ₹5,00,000</small></div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ CALENDAR ═══════════════════════════════ -->
+    <div id="screen-calendar" class="screen">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ My Calendar</span></div>
+        <h1>My Calendar</h1>
+        <p>Payment schedules, EMD releases, subscription renewals & dispute hearings</p>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'cal-month')">Month View</div>
+        <div class="tab" onclick="switchTab(this,'cal-agenda')">Agenda</div>
+        <div class="tab" onclick="switchTab(this,'cal-reminders')">Reminders</div>
+        <div class="tab" onclick="switchTab(this,'cal-due')">Due Dates</div>
+      </div>
+
+      <div id="cal-month">
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">◀ April 2026 ▶</span>
+              <span class="card-action">+ Add Event</span>
+            </div>
+            <div class="card-body">
+              <div class="cal-grid">
+                <div class="cal-day-hdr">SUN</div><div class="cal-day-hdr">MON</div><div class="cal-day-hdr">TUE</div><div class="cal-day-hdr">WED</div><div class="cal-day-hdr">THU</div><div class="cal-day-hdr">FRI</div><div class="cal-day-hdr">SAT</div>
+                <div class="cal-day other-month">30</div><div class="cal-day other-month">31</div><div class="cal-day other-month"></div>
+                <div class="cal-day today">1</div><div class="cal-day has-event">2</div><div class="cal-day has-event">3</div><div class="cal-day">4</div>
+                <div class="cal-day">5</div><div class="cal-day has-event">6</div><div class="cal-day has-event">7</div><div class="cal-day">8</div><div class="cal-day event-day has-event">9</div><div class="cal-day">10</div><div class="cal-day">11</div>
+                <div class="cal-day">12</div><div class="cal-day has-event">13</div><div class="cal-day">14</div><div class="cal-day has-event">15</div><div class="cal-day">16</div><div class="cal-day event-day has-event">17</div><div class="cal-day">18</div>
+                <div class="cal-day">19</div><div class="cal-day has-event">20</div><div class="cal-day">21</div><div class="cal-day">22</div><div class="cal-day has-event">23</div><div class="cal-day">24</div><div class="cal-day event-day">25</div>
+                <div class="cal-day">26</div><div class="cal-day has-event">27</div><div class="cal-day">28</div><div class="cal-day">29</div><div class="cal-day">30</div><div class="cal-day other-month">1</div><div class="cal-day other-month">2</div>
+              </div>
+              <div style="margin-top:14px;display:flex;gap:16px;flex-wrap:wrap;">
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)"><span style="width:8px;height:8px;background:var(--amber);border-radius:50%;display:inline-block"></span>Payment Due</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)"><span style="width:8px;height:8px;background:var(--blue);border-radius:50%;display:inline-block"></span>EMD Release</span>
+                <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)"><span style="width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block"></span>Dispute Hearing</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">Upcoming Events</span></div>
+            <div class="card-body">
+              <ul class="timeline">
+                <li class="tl-item"><div class="tl-dot tl-dot-amber">₹</div><div class="tl-content"><p>Invoice INV-2044 — RajSteel Pvt Ltd due</p><small>2 Apr 2026 · ₹3,45,000</small></div></li>
+                <li class="tl-item"><div class="tl-dot tl-dot-amber">₹</div><div class="tl-content"><p>Subscription renewal — MetalCraft Inc</p><small>3 Apr 2026 · ₹1,80,000/yr</small></div></li>
+                <li class="tl-item"><div class="tl-dot tl-dot-blue">↩</div><div class="tl-content"><p>EMD Release — Auction AUC-4879 closed</p><small>9 Apr 2026 · ₹8,50,000</small></div></li>
+                <li class="tl-item"><div class="tl-dot tl-dot-green">⚖</div><div class="tl-content"><p>Dispute Hearing — DIS-0039</p><small>17 Apr 2026 · IndoChem vs SteelVault</small></div></li>
+                <li class="tl-item"><div class="tl-dot tl-dot-amber">₹</div><div class="tl-content"><p>GST filing deadline — Q4 FY26</p><small>20 Apr 2026</small></div></li>
+                <li class="tl-item"><div class="tl-dot tl-dot-blue">↩</div><div class="tl-content"><p>EMD Batch Release — 14 auctions</p><small>27 Apr 2026 · ₹22,00,000</small></div></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="cal-agenda" style="display:none;">
+        <div class="card"><div class="card-header"><span class="card-title">Agenda View</span></div><div class="empty-state"><div class="es-icon">📋</div><p>Select Month View to see the calendar</p></div></div>
+      </div>
+      <div id="cal-reminders" style="display:none;">
+        <div class="card"><div class="card-header"><span class="card-title">Reminders</span><span class="card-action">+ Add Reminder</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Reminder</th><th>Date</th><th>Category</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="td-bold">Subscription Renewal — Bharat Alloys</td><td>Apr 6</td><td><span class="badge badge-blue">Subscription</span></td><td><span class="badge badge-yellow">Pending</span></td></tr>
+          <tr><td class="td-bold">GST Filing Q4 FY26</td><td>Apr 20</td><td><span class="badge badge-amber">Compliance</span></td><td><span class="badge badge-yellow">Upcoming</span></td></tr>
+          <tr><td class="td-bold">Invoice Follow-up — IndoChem</td><td>Apr 7</td><td><span class="badge badge-red">Overdue</span></td><td><span class="badge badge-red">Overdue</span></td></tr>
+        </tbody></table></div></div>
+      </div>
+      <div id="cal-due" style="display:none;">
+        <div class="card"><div class="card-header"><span class="card-title">Due Dates Tracker</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Reference</th><th>Description</th><th>Due</th><th>Amount</th><th>Days Left</th></tr></thead>
+        <tbody>
+          <tr><td class="td-bold">INV-2044</td><td>Invoice — RajSteel Pvt Ltd</td><td>2 Apr</td><td>₹3,45,000</td><td><span class="badge badge-red">1 day</span></td></tr>
+          <tr><td class="td-bold">SUB-1133</td><td>Subscription — MetalCraft Inc</td><td>3 Apr</td><td>₹1,80,000</td><td><span class="badge badge-yellow">2 days</span></td></tr>
+          <tr><td class="td-bold">EMD-AUC4879</td><td>EMD Release — Auction closed</td><td>9 Apr</td><td>₹8,50,000</td><td><span class="badge badge-green">8 days</span></td></tr>
+        </tbody></table></div></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ EMD REFUND ═══════════════════════════════ -->
+    <div id="screen-emd-refund" class="screen">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ EMD Management / EMD Refunds</span></div>
+        <h1>EMD Refund Management</h1>
+        <p>Process, approve and track refund requests for unsuccessful bidders</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Pending Approval<div class="stat-icon si-red">⏳</div></div><div class="stat-value">12</div><div class="stat-delta down">₹28,40,000 queued</div></div>
+        <div class="stat-card"><div class="stat-label">Approved Today<div class="stat-icon si-green">✓</div></div><div class="stat-value">7</div><div class="stat-delta up">₹14,00,000</div></div>
+        <div class="stat-card"><div class="stat-label">Processed MTD<div class="stat-icon si-blue">⇄</div></div><div class="stat-value">84</div><div class="stat-delta up">₹1.8 Cr</div></div>
+        <div class="stat-card"><div class="stat-label">Failed Refunds<div class="stat-icon si-amber">!</div></div><div class="stat-value">3</div><div class="stat-delta down">Retry required</div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'emd-r-pending')">Pending Approval (12)</div>
+        <div class="tab" onclick="switchTab(this,'emd-r-approved')">Approved</div>
+        <div class="tab" onclick="switchTab(this,'emd-r-bulk')">Bulk Processing</div>
+        <div class="tab" onclick="switchTab(this,'emd-r-history')">Refund History</div>
+      </div>
+      <div id="emd-r-pending">
+        <div class="filter-bar">
+          <input class="filter-input" placeholder="🔍 Search by party, auction ID..." />
+          <select class="filter-select"><option>All Auctions</option><option>Forward</option><option>Reverse</option><option>Dutch</option></select>
+          <select class="filter-select"><option>All Amounts</option><option>Under ₹1L</option><option>₹1L–₹5L</option><option>Above ₹5L</option></select>
+          <button class="tb-btn primary">✓ Approve Selected</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th><input type="checkbox" /></th><th>Refund ID</th><th>Bidder</th><th>Auction</th><th>EMD Amount</th><th>Requested On</th><th>Days Pending</th><th>Bank Status</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr><td><input type="checkbox"/></td><td class="td-bold">RFD-1091</td><td>Bharat Alloys</td><td>AUC-4872</td><td class="td-bold">₹5,00,000</td><td>28 Mar</td><td><span class="badge badge-red">4 days</span></td><td><span class="badge badge-green">Verified</span></td><td><div class="tbl-actions"><div class="tbl-action">✓</div><div class="tbl-action">👁</div><div class="tbl-action red">✕</div></div></td></tr>
+                <tr><td><input type="checkbox"/></td><td class="td-bold">RFD-1090</td><td>IndoChem Corp</td><td>AUC-4869</td><td class="td-bold">₹2,50,000</td><td>28 Mar</td><td><span class="badge badge-red">4 days</span></td><td><span class="badge badge-yellow">Pending</span></td><td><div class="tbl-actions"><div class="tbl-action">✓</div><div class="tbl-action">👁</div><div class="tbl-action red">✕</div></div></td></tr>
+                <tr><td><input type="checkbox"/></td><td class="td-bold">RFD-1089</td><td>SteelVault Ltd</td><td>AUC-4868</td><td class="td-bold">₹3,50,000</td><td>29 Mar</td><td><span class="badge badge-yellow">3 days</span></td><td><span class="badge badge-red">Failed</span></td><td><div class="tbl-actions"><div class="tbl-action">✓</div><div class="tbl-action">👁</div><div class="tbl-action red">✕</div></div></td></tr>
+                <tr><td><input type="checkbox"/></td><td class="td-bold">RFD-1088</td><td>PrimeOre Exports</td><td>AUC-4865</td><td class="td-bold">₹1,00,000</td><td>30 Mar</td><td><span class="badge badge-yellow">2 days</span></td><td><span class="badge badge-green">Verified</span></td><td><div class="tbl-actions"><div class="tbl-action">✓</div><div class="tbl-action">👁</div><div class="tbl-action red">✕</div></div></td></tr>
+                <tr><td><input type="checkbox"/></td><td class="td-bold">RFD-1087</td><td>MetalCraft Inc</td><td>AUC-4862</td><td class="td-bold">₹75,000</td><td>30 Mar</td><td><span class="badge badge-yellow">2 days</span></td><td><span class="badge badge-green">Verified</span></td><td><div class="tbl-actions"><div class="tbl-action">✓</div><div class="tbl-action">👁</div><div class="tbl-action red">✕</div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="emd-r-approved" style="display:none;">
+        <div class="card"><div class="card-header"><span class="card-title">Approved Refunds — Today</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Refund ID</th><th>Bidder</th><th>Amount</th><th>Approved By</th><th>NEFT / UTR</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="td-bold">RFD-1086</td><td>RajSteel Pvt Ltd</td><td class="td-bold">₹4,00,000</td><td>Priya R.</td><td>UTR2604240001</td><td><span class="badge badge-green">Transferred</span></td></tr>
+          <tr><td class="td-bold">RFD-1085</td><td>Alliance Metals</td><td class="td-bold">₹1,25,000</td><td>Priya R.</td><td>UTR2604240002</td><td><span class="badge badge-blue">In Transit</span></td></tr>
+        </tbody></table></div></div>
+      </div>
+      <div id="emd-r-bulk" style="display:none;">
+        <div class="card"><div class="card-header"><span class="card-title">Bulk Refund Processing</span><span class="card-action">Upload CSV</span></div>
+        <div class="card-body">
+          <div class="alert alert-blue"><span class="alert-icon">ℹ</span><div class="alert-body"><strong>Bulk Mode</strong> Select multiple refunds and approve them in a single batch. Max 50 refunds per batch.</div></div>
+          <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
+            <button class="tb-btn primary">⬆ Upload Refund CSV</button>
+            <button class="tb-btn">🔍 Validate Entries</button>
+            <button class="tb-btn">📤 Process Batch</button>
+          </div>
+        </div></div>
+      </div>
+      <div id="emd-r-history" style="display:none;">
+        <div class="card"><div class="card-header"><span class="card-title">Refund History</span><span class="card-action">⬇ Export</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Refund ID</th><th>Bidder</th><th>Auction</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="td-bold">RFD-1084</td><td>CopperLine Ltd</td><td>AUC-4858</td><td>₹2,00,000</td><td>27 Mar</td><td><span class="badge badge-green">Transferred</span></td></tr>
+          <tr><td class="td-bold">RFD-1083</td><td>NovaMetal Corp</td><td>AUC-4855</td><td>₹90,000</td><td>26 Mar</td><td><span class="badge badge-green">Transferred</span></td></tr>
+          <tr><td class="td-bold">RFD-1082</td><td>SteelVault Ltd</td><td>AUC-4851</td><td>₹3,75,000</td><td>25 Mar</td><td><span class="badge badge-muted">Cancelled</span></td></tr>
+        </tbody></table></div></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ EMD TRACKING ═══════════════════════════════ -->
+    <div id="screen-emd-tracking" class="screen">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ EMD Management / EMD Tracking</span></div>
+        <h1>EMD Tracking</h1>
+        <p>Monitor active EMD holdings, forfeiture and auction-wise release status</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total EMD Held<div class="stat-icon si-blue">🔒</div></div><div class="stat-value">₹6.32 Cr</div><div class="stat-delta neutral">247 active auctions</div></div>
+        <div class="stat-card"><div class="stat-label">Released This Week<div class="stat-icon si-green">↑</div></div><div class="stat-value">₹98.5 L</div><div class="stat-delta up">31 auctions closed</div></div>
+        <div class="stat-card"><div class="stat-label">Forfeited MTD<div class="stat-icon si-red">⚑</div></div><div class="stat-value">₹22.1 L</div><div class="stat-delta down">8 forfeitures</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Release<div class="stat-icon si-amber">⏳</div></div><div class="stat-value">₹1.4 Cr</div><div class="stat-delta neutral">42 awaiting close</div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'emd-t-active')">Active Holdings</div>
+        <div class="tab" onclick="switchTab(this,'emd-t-forfeit')">Forfeiture Management</div>
+        <div class="tab" onclick="switchTab(this,'emd-t-adjust')">Adjustments & Transfers</div>
+        <div class="tab" onclick="switchTab(this,'emd-t-report')">Forfeiture Report</div>
+      </div>
+      <div id="emd-t-active">
+        <div class="filter-bar">
+          <input class="filter-input" placeholder="🔍 Search auction, bidder..." />
+          <select class="filter-select"><option>All Types</option><option>Forward</option><option>Reverse</option><option>Dutch</option></select>
+          <select class="filter-select"><option>All Status</option><option>Active</option><option>Pending Release</option><option>Disputed</option></select>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Auction ID</th><th>Title</th><th>Type</th><th>Bidder</th><th>EMD Amount</th><th>Deposited On</th><th>Auction Status</th><th>EMD Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td class="td-bold">AUC-4879</td><td>HMS Scrap — Lot A</td><td><span class="badge badge-amber">Forward</span></td><td>RajSteel Pvt Ltd</td><td class="td-bold">₹5,00,000</td><td>28 Mar</td><td><span class="badge badge-green">Closed</span></td><td><span class="badge badge-blue">Pending Release</span></td><td><div class="tbl-action">↩</div></td></tr>
+                <tr><td class="td-bold">AUC-4880</td><td>CR Sheets — Q2</td><td><span class="badge badge-blue">Reverse</span></td><td>Bharat Alloys</td><td class="td-bold">₹2,00,000</td><td>30 Mar</td><td><span class="badge badge-yellow">Live</span></td><td><span class="badge badge-green">Held</span></td><td><div class="tbl-action">👁</div></td></tr>
+                <tr><td class="td-bold">AUC-4881</td><td>Iron Ore — Goa Port</td><td><span class="badge badge-amber">Forward</span></td><td>IndoChem Corp</td><td class="td-bold">₹8,50,000</td><td>31 Mar</td><td><span class="badge badge-yellow">Live</span></td><td><span class="badge badge-green">Held</span></td><td><div class="tbl-action">👁</div></td></tr>
+                <tr><td class="td-bold">AUC-4875</td><td>Copper Wire Rods</td><td><span class="badge badge-green">Dutch</span></td><td>MetalCraft Inc</td><td class="td-bold">₹1,20,000</td><td>25 Mar</td><td><span class="badge badge-muted">Cancelled</span></td><td><span class="badge badge-yellow">For Refund</span></td><td><div class="tbl-action">↩</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="emd-t-forfeit" style="display:none;">
+        <div class="card"><div class="card-header"><span class="card-title">EMD Forfeiture Cases</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Case ID</th><th>Bidder</th><th>Auction</th><th>EMD Amount</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td class="td-bold">FRF-0021</td><td>SteelVault Ltd</td><td>AUC-4851</td><td class="td-bold">₹3,75,000</td><td>Non-payment post bid</td><td><span class="badge badge-red">Forfeited</span></td><td><div class="tbl-action">📄</div></td></tr>
+          <tr><td class="td-bold">FRF-0020</td><td>OreLink Pvt Ltd</td><td>AUC-4847</td><td class="td-bold">₹2,00,000</td><td>Document fraud</td><td><span class="badge badge-yellow">Under Review</span></td><td><div class="tbl-action">📄</div></td></tr>
+        </tbody></table></div></div>
+      </div>
+      <div id="emd-t-adjust" style="display:none;">
+        <div class="card"><div class="card-header"><span class="card-title">EMD Adjustments & Transfers</span></div><div class="card-body">
+          <div class="form-row"><div class="form-group"><label class="form-label">Source Auction</label><input class="form-input" value="AUC-4872"/></div><div class="form-group"><label class="form-label">Target Auction</label><input class="form-input" placeholder="AUC-XXXX"/></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Bidder</label><input class="form-input" value="Bharat Alloys"/></div><div class="form-group"><label class="form-label">Amount to Transfer</label><input class="form-input" placeholder="₹0.00"/></div></div>
+          <div style="display:flex;gap:10px;margin-top:4px;"><button class="tb-btn primary">Transfer EMD</button><button class="tb-btn">Cancel</button></div>
+        </div></div>
+      </div>
+      <div id="emd-t-report" style="display:none;">
+        <div class="stats-grid-3">
+          <div class="stat-card"><div class="stat-label">Total Forfeited (FY26)</div><div class="stat-value">₹1.8 Cr</div><div class="stat-delta down">42 cases</div></div>
+          <div class="stat-card"><div class="stat-label">Reversed (FY26)</div><div class="stat-value">₹24 L</div><div class="stat-delta up">8 cases reversed</div></div>
+          <div class="stat-card"><div class="stat-label">Under Dispute</div><div class="stat-value">₹36 L</div><div class="stat-delta neutral">6 ongoing cases</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ SUBSCRIPTION ═══════════════════════════════ -->
+    <div id="screen-subscription" class="screen">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ Subscription Management</span></div>
+        <h1>Subscription Management</h1>
+        <p>Manage plans, renewals, upgrades and subscription revenue analytics</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Active Subscriptions<div class="stat-icon si-green">✓</div></div><div class="stat-value">318</div><div class="stat-delta up">▲ 12 this month</div></div>
+        <div class="stat-card"><div class="stat-label">MRR (Subscription)<div class="stat-icon si-amber">₹</div></div><div class="stat-value">₹84.6 L</div><div class="stat-delta up">▲ 8.4%</div></div>
+        <div class="stat-card"><div class="stat-label">Expiring This Week<div class="stat-icon si-red">⏳</div></div><div class="stat-value">7</div><div class="stat-delta down">₹12,60,000 at risk</div></div>
+        <div class="stat-card"><div class="stat-label">Churn MTD<div class="stat-icon si-red">↓</div></div><div class="stat-value">3</div><div class="stat-delta down">2.1% churn rate</div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'sub-active')">Active Plans</div>
+        <div class="tab" onclick="switchTab(this,'sub-renew')">Renewals</div>
+        <div class="tab" onclick="switchTab(this,'sub-upgrade')">Upgrades / Downgrades</div>
+        <div class="tab" onclick="switchTab(this,'sub-payment')">Payment History</div>
+        <div class="tab" onclick="switchTab(this,'sub-analytics')">Analytics</div>
+      </div>
+      <div id="sub-active">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Active Subscriptions</span><button class="tb-btn primary">+ New Subscription</button></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Company</th><th>Plan</th><th>Billing</th><th>Amount</th><th>Start</th><th>Renewal</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td class="td-bold">RajSteel Pvt Ltd</td><td>Enterprise Pro</td><td>Annual</td><td class="td-bold">₹3,60,000</td><td>1 Apr 25</td><td>1 Apr 26</td><td><span class="badge badge-yellow">Expiring Soon</span></td><td><div class="tbl-actions"><div class="tbl-action">✎</div><div class="tbl-action">↻</div></div></td></tr>
+                <tr><td class="td-bold">Bharat Alloys</td><td>Business Plus</td><td>Annual</td><td class="td-bold">₹1,80,000</td><td>15 Oct 25</td><td>15 Oct 26</td><td><span class="badge badge-green">Active</span></td><td><div class="tbl-actions"><div class="tbl-action">✎</div><div class="tbl-action">↻</div></div></td></tr>
+                <tr><td class="td-bold">IndoChem Corp</td><td>Starter</td><td>Monthly</td><td class="td-bold">₹12,000</td><td>1 Mar 26</td><td>1 May 26</td><td><span class="badge badge-green">Active</span></td><td><div class="tbl-actions"><div class="tbl-action">✎</div><div class="tbl-action">↑</div></div></td></tr>
+                <tr><td class="td-bold">MetalCraft Inc</td><td>Business Plus</td><td>Annual</td><td class="td-bold">₹1,80,000</td><td>3 Apr 25</td><td>3 Apr 26</td><td><span class="badge badge-yellow">Expiring Soon</span></td><td><div class="tbl-actions"><div class="tbl-action">✎</div><div class="tbl-action">↻</div></div></td></tr>
+                <tr><td class="td-bold">SteelVault Ltd</td><td>Enterprise Pro</td><td>Annual</td><td class="td-bold">₹3,60,000</td><td>22 Nov 25</td><td>22 Nov 26</td><td><span class="badge badge-green">Active</span></td><td><div class="tbl-actions"><div class="tbl-action">✎</div><div class="tbl-action">↻</div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="sub-renew" style="display:none;">
+        <div class="alert alert-yellow"><span class="alert-icon">⚠</span><div class="alert-body"><strong>3 subscriptions need immediate renewal action.</strong> Failure to renew will restrict platform access for these companies.</div></div>
+        <div class="card"><div class="card-header"><span class="card-title">Renewal Queue</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Company</th><th>Plan</th><th>Expires</th><th>Amount</th><th>Auto-Renew</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td class="td-bold">RajSteel Pvt Ltd</td><td>Enterprise Pro</td><td><span class="badge badge-red">Today</span></td><td>₹3,60,000</td><td><span class="badge badge-muted">Off</span></td><td><button class="tb-btn primary">Renew Now</button></td></tr>
+          <tr><td class="td-bold">Bharat Alloys</td><td>Business Plus</td><td><span class="badge badge-yellow">3 days</span></td><td>₹1,80,000</td><td><span class="badge badge-green">On</span></td><td><button class="tb-btn">View Invoice</button></td></tr>
+          <tr><td class="td-bold">MetalCraft Inc</td><td>Business Plus</td><td><span class="badge badge-yellow">2 days</span></td><td>₹1,80,000</td><td><span class="badge badge-muted">Off</span></td><td><button class="tb-btn primary">Renew Now</button></td></tr>
+        </tbody></table></div></div>
+      </div>
+      <div id="sub-upgrade" style="display:none;">
+        <div class="card"><div class="card-header"><span class="card-title">Upgrade / Downgrade Requests</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Company</th><th>From Plan</th><th>To Plan</th><th>Diff Amount</th><th>Requested</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="td-bold">IndoChem Corp</td><td>Starter</td><td>Business Plus</td><td class="td-bold">+₹1,68,000</td><td>1 Apr</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+          <tr><td class="td-bold">PrimeOre Exports</td><td>Enterprise Pro</td><td>Business Plus</td><td class="td-bold">-₹1,80,000</td><td>28 Mar</td><td><span class="badge badge-blue">Processing</span></td></tr>
+        </tbody></table></div></div>
+      </div>
+      <div id="sub-payment" style="display:none;">
+        <div class="card"><div class="card-header"><span class="card-title">Subscription Payment History</span><span class="card-action">⬇ Export</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Company</th><th>Plan</th><th>Amount</th><th>Date</th><th>Method</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="td-bold">SINV-4421</td><td>Bharat Alloys</td><td>Business Plus</td><td>₹1,80,000</td><td>1 Apr</td><td>NEFT</td><td><span class="badge badge-green">Paid</span></td></tr>
+          <tr><td class="td-bold">SINV-4420</td><td>SteelVault Ltd</td><td>Enterprise Pro</td><td>₹3,60,000</td><td>22 Nov</td><td>RTGS</td><td><span class="badge badge-green">Paid</span></td></tr>
+        </tbody></table></div></div>
+      </div>
+      <div id="sub-analytics" style="display:none;">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">ARR (Annual Recurring)</div><div class="stat-value">₹9.84 Cr</div><div class="stat-delta up">▲ 22% YoY</div></div>
+          <div class="stat-card"><div class="stat-label">Avg Revenue / User</div><div class="stat-value">₹30,943</div><div class="stat-delta up">▲ 5%</div></div>
+          <div class="stat-card"><div class="stat-label">Enterprise Plans</div><div class="stat-value">42</div><div class="stat-delta up">▲ 4 this month</div></div>
+          <div class="stat-card"><div class="stat-label">Starter Plans</div><div class="stat-value">187</div><div class="stat-delta neutral">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ ADVERTISEMENT ═══════════════════════════════ -->
+    <div id="screen-advertisement" class="screen">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ Advertisement Management</span></div>
+        <h1>Advertisement Management</h1>
+        <p>Billing, spend tracking, invoicing and credits for ad campaigns</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Ad Revenue MTD<div class="stat-icon si-green">📣</div></div><div class="stat-value">₹31.4 L</div><div class="stat-delta up">▲ 18% vs last month</div></div>
+        <div class="stat-card"><div class="stat-label">Active Campaigns<div class="stat-icon si-amber">▶</div></div><div class="stat-value">24</div><div class="stat-delta neutral">—</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Billing<div class="stat-icon si-yellow">⏳</div></div><div class="stat-value">₹8.2 L</div><div class="stat-delta down">6 invoices due</div></div>
+        <div class="stat-card"><div class="stat-label">Ad Credits Issued<div class="stat-icon si-blue">⭐</div></div><div class="stat-value">₹2.1 L</div><div class="stat-delta neutral">—</div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'ad-campaigns')">Campaign Billing</div>
+        <div class="tab" onclick="switchTab(this,'ad-spend')">Spend Tracking</div>
+        <div class="tab" onclick="switchTab(this,'ad-invoices')">Ad Invoices</div>
+        <div class="tab" onclick="switchTab(this,'ad-credits')">Ad Credits</div>
+      </div>
+      <div id="ad-campaigns">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Active Campaign Billing</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Campaign ID</th><th>Advertiser</th><th>Type</th><th>Budget</th><th>Spent</th><th>Balance</th><th>Billing</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td class="td-bold">ADV-0441</td><td>RajSteel Pvt Ltd</td><td>Banner + Spotlight</td><td>₹2,00,000</td><td>₹1,40,000</td><td class="td-bold">₹60,000</td><td>Post-paid</td><td><span class="badge badge-green">Active</span></td></tr>
+                <tr><td class="td-bold">ADV-0438</td><td>IndoChem Corp</td><td>Featured Listing</td><td>₹80,000</td><td>₹80,000</td><td class="td-bold" style="color:var(--red)">₹0</td><td>Pre-paid</td><td><span class="badge badge-red">Budget Depleted</span></td></tr>
+                <tr><td class="td-bold">ADV-0435</td><td>MetalCraft Inc</td><td>Email Blast</td><td>₹45,000</td><td>₹22,000</td><td class="td-bold">₹23,000</td><td>Post-paid</td><td><span class="badge badge-green">Active</span></td></tr>
+                <tr><td class="td-bold">ADV-0430</td><td>Bharat Alloys</td><td>Homepage Banner</td><td>₹1,50,000</td><td>₹60,000</td><td class="td-bold">₹90,000</td><td>Pre-paid</td><td><span class="badge badge-blue">Scheduled</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="ad-spend" style="display:none;"><div class="card"><div class="card-body"><div class="alert alert-blue"><span class="alert-icon">📊</span><div class="alert-body"><strong>Spend Tracking</strong> Daily spend analytics across all campaigns. View the Reports & MIS module for detailed ad spend breakdown.</div></div></div></div></div>
+      <div id="ad-invoices" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Advertisement Invoices</span><button class="tb-btn primary">+ Create Ad Invoice</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Advertiser</th><th>Campaign</th><th>Amount</th><th>Due</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">AINV-0041</td><td>IndoChem Corp</td><td>ADV-0438</td><td>₹80,000</td><td>5 Apr</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+        <tr><td class="td-bold">AINV-0040</td><td>RajSteel Pvt Ltd</td><td>ADV-0441</td><td>₹1,40,000</td><td>10 Apr</td><td><span class="badge badge-blue">Sent</span></td></tr>
+      </tbody></table></div></div>
+      </div>
+      <div id="ad-credits" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Ad Credits Register</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Company</th><th>Credits Issued</th><th>Used</th><th>Balance</th><th>Expiry</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">SteelVault Ltd</td><td>₹50,000</td><td>₹32,000</td><td class="td-bold">₹18,000</td><td>30 Jun 26</td></tr>
+        <tr><td class="td-bold">PrimeOre Exports</td><td>₹25,000</td><td>₹25,000</td><td class="td-bold" style="color:var(--text-muted)">₹0</td><td>—</td></tr>
+      </tbody></table></div></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ TRANSACTIONS ═══════════════════════════════ -->
+    <div id="screen-transactions" class="screen">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ Transactions</span></div>
+        <h1>Transactions</h1>
+        <p>All financial movements — deposits, payments, refunds, commissions and settlements</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Volume MTD<div class="stat-icon si-amber">⇄</div></div><div class="stat-value">₹18.4 Cr</div><div class="stat-delta up">▲ 9.2%</div></div>
+        <div class="stat-card"><div class="stat-label">Successful<div class="stat-icon si-green">✓</div></div><div class="stat-value">2,841</div><div class="stat-delta up">98.2% success rate</div></div>
+        <div class="stat-card"><div class="stat-label">Failed / Reversed<div class="stat-icon si-red">✕</div></div><div class="stat-value">52</div><div class="stat-delta down">₹38 L affected</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Settlement<div class="stat-icon si-blue">⏳</div></div><div class="stat-value">₹2.1 Cr</div><div class="stat-delta neutral">—</div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'txn-all')">All Transactions</div>
+        <div class="tab" onclick="switchTab(this,'txn-failed')">Failed / Reversed</div>
+        <div class="tab" onclick="switchTab(this,'txn-recon')">Reconciliation</div>
+        <div class="tab" onclick="switchTab(this,'txn-export')">Export & Download</div>
+      </div>
+      <div id="txn-all">
+        <div class="filter-bar">
+          <input class="filter-input" placeholder="🔍 TXN ID, party name, UTR..."/>
+          <select class="filter-select"><option>All Types</option><option>EMD Deposit</option><option>EMD Refund</option><option>Subscription</option><option>Commission</option><option>Advertisement</option><option>Settlement</option></select>
+          <select class="filter-select"><option>All Status</option><option>Success</option><option>Pending</option><option>Failed</option></select>
+          <select class="filter-select"><option>Today</option><option>This Week</option><option>This Month</option><option>Custom Range</option></select>
+          <button class="tb-btn">⬇ Export CSV</button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>TXN ID</th><th>Date</th><th>Party</th><th>Type</th><th>Mode</th><th>Amount</th><th>UTR / Ref</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td class="td-bold">TXN-9847</td><td>1 Apr, 09:14</td><td>RajSteel Pvt Ltd</td><td>EMD Deposit</td><td>RTGS</td><td class="td-bold">₹5,00,000</td><td>UTR2604100021</td><td><span class="badge badge-green">Success</span></td></tr>
+                <tr><td class="td-bold">TXN-9846</td><td>1 Apr, 08:52</td><td>Bharat Alloys</td><td>Subscription</td><td>NEFT</td><td class="td-bold">₹1,80,000</td><td>UTR2604100018</td><td><span class="badge badge-green">Success</span></td></tr>
+                <tr><td class="td-bold">TXN-9845</td><td>1 Apr, 08:30</td><td>IndoChem Corp</td><td>Commission</td><td>UPI</td><td class="td-bold">₹84,500</td><td>UPI26041REF04</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+                <tr><td class="td-bold">TXN-9844</td><td>1 Apr, 07:55</td><td>MetalCraft Inc</td><td>Ad Payment</td><td>UPI</td><td class="td-bold">₹22,000</td><td>UPI26041REF03</td><td><span class="badge badge-green">Success</span></td></tr>
+                <tr><td class="td-bold">TXN-9843</td><td>31 Mar, 17:30</td><td>SteelVault Ltd</td><td>EMD Refund</td><td>NEFT</td><td class="td-bold">₹3,50,000</td><td>—</td><td><span class="badge badge-red">Failed</span></td></tr>
+                <tr><td class="td-bold">TXN-9842</td><td>31 Mar, 15:12</td><td>PrimeOre Exports</td><td>Settlement</td><td>RTGS</td><td class="td-bold">₹12,40,000</td><td>UTR3103120007</td><td><span class="badge badge-green">Success</span></td></tr>
+                <tr><td class="td-bold">TXN-9841</td><td>31 Mar, 12:45</td><td>CopperLine Ltd</td><td>EMD Deposit</td><td>IMPS</td><td class="td-bold">₹75,000</td><td>IMPS310312009</td><td><span class="badge badge-green">Success</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="txn-failed" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Failed & Reversed Transactions</span></div>
+      <div class="table-wrap"><table><thead><tr><th>TXN ID</th><th>Party</th><th>Type</th><th>Amount</th><th>Failure Reason</th><th>Date</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">TXN-9843</td><td>SteelVault Ltd</td><td>EMD Refund</td><td>₹3,50,000</td><td>Invalid IFSC</td><td>31 Mar</td><td><button class="tb-btn primary">↻ Retry</button></td></tr>
+        <tr><td class="td-bold">TXN-9801</td><td>NovaMetal Corp</td><td>Commission</td><td>₹44,000</td><td>Insufficient funds</td><td>29 Mar</td><td><button class="tb-btn">Contact</button></td></tr>
+      </tbody></table></div></div>
+      </div>
+      <div id="txn-recon" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Transaction Reconciliation</span></div>
+      <div class="card-body"><div class="info-row"><span class="info-key">Total Ledger Credits</span><span class="info-val">₹18,84,22,440</span></div><div class="info-row"><span class="info-key">Total Ledger Debits</span><span class="info-val">₹17,04,18,200</span></div><div class="info-row"><span class="info-key">Net Balance</span><span class="info-val">₹1,80,04,240</span></div><div class="info-row"><span class="info-key">Unreconciled Items</span><span class="info-val" style="color:var(--red)">3 items (₹38 L)</span></div></div>
+      </div>
+      </div>
+      <div id="txn-export" style="display:none;"><div class="card"><div class="card-body"><div style="display:flex;gap:12px;flex-wrap:wrap;"><button class="tb-btn primary">⬇ Export as CSV</button><button class="tb-btn">⬇ Export as Excel</button><button class="tb-btn">⬇ Export as PDF</button></div></div></div></div>
+    </div>
+
+    <!-- ═══════════════════════════════ INVOICES ═══════════════════════════════ -->
+    <div id="screen-invoices" class="screen">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ Invoice Management</span></div>
+        <h1>Invoice Management</h1>
+        <p>Create, track and manage all invoices across subscriptions, commissions and advertisements</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Invoiced MTD<div class="stat-icon si-amber">🧾</div></div><div class="stat-value">₹1.42 Cr</div><div class="stat-delta up">▲ 12%</div></div>
+        <div class="stat-card"><div class="stat-label">Paid<div class="stat-icon si-green">✓</div></div><div class="stat-value">₹1.1 Cr</div><div class="stat-delta up">77% collection</div></div>
+        <div class="stat-card"><div class="stat-label">Pending<div class="stat-icon si-blue">⏳</div></div><div class="stat-value">₹22.6 L</div><div class="stat-delta neutral">—</div></div>
+        <div class="stat-card"><div class="stat-label">Overdue<div class="stat-icon si-red">!</div></div><div class="stat-value">₹9.7 L</div><div class="stat-delta down">5 invoices</div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'inv-all')">All Invoices</div>
+        <div class="tab" onclick="switchTab(this,'inv-create')">Create Invoice</div>
+        <div class="tab" onclick="switchTab(this,'inv-overdue')">Overdue (5)</div>
+        <div class="tab" onclick="switchTab(this,'inv-credit')">Credit Notes</div>
+      </div>
+      <div id="inv-all">
+        <div class="filter-bar">
+          <input class="filter-input" placeholder="🔍 Invoice #, company name..."/>
+          <select class="filter-select"><option>All Categories</option><option>Subscription</option><option>Commission</option><option>Advertisement</option><option>EMD Forfeiture</option></select>
+          <select class="filter-select"><option>All Status</option><option>Paid</option><option>Pending</option><option>Overdue</option><option>Draft</option></select>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Invoice #</th><th>Company</th><th>Category</th><th>Amount</th><th>GST</th><th>Total</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr><td class="td-bold">INV-2044</td><td>RajSteel Pvt Ltd</td><td>Subscription</td><td>₹3,05,085</td><td>₹54,915</td><td class="td-bold">₹3,60,000</td><td><span class="badge badge-red">2 Apr</span></td><td><span class="badge badge-red">Overdue</span></td><td><div class="tbl-actions"><div class="tbl-action">👁</div><div class="tbl-action">📤</div><div class="tbl-action">⬇</div></div></td></tr>
+                <tr><td class="td-bold">INV-2043</td><td>Bharat Alloys</td><td>Subscription</td><td>₹1,52,542</td><td>₹27,458</td><td class="td-bold">₹1,80,000</td><td>1 Apr</td><td><span class="badge badge-green">Paid</span></td><td><div class="tbl-actions"><div class="tbl-action">👁</div><div class="tbl-action">⬇</div></div></td></tr>
+                <tr><td class="td-bold">INV-2042</td><td>IndoChem Corp</td><td>Commission</td><td>₹71,610</td><td>₹12,890</td><td class="td-bold">₹84,500</td><td>5 Apr</td><td><span class="badge badge-blue">Sent</span></td><td><div class="tbl-actions"><div class="tbl-action">👁</div><div class="tbl-action">📤</div><div class="tbl-action">⬇</div></div></td></tr>
+                <tr><td class="td-bold">INV-2041</td><td>MetalCraft Inc</td><td>Advertisement</td><td>₹18,644</td><td>₹3,356</td><td class="td-bold">₹22,000</td><td>31 Mar</td><td><span class="badge badge-green">Paid</span></td><td><div class="tbl-actions"><div class="tbl-action">👁</div><div class="tbl-action">⬇</div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="inv-create" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Create New Invoice</span></div><div class="card-body">
+        <div class="form-row"><div class="form-group"><label class="form-label">Company Name</label><input class="form-input" placeholder="Select company..."/></div><div class="form-group"><label class="form-label">Invoice Category</label><select class="filter-select" style="width:100%;height:36px;"><option>Subscription</option><option>Commission</option><option>Advertisement</option><option>EMD Forfeiture</option></select></div></div>
+        <div class="form-row"><div class="form-group"><label class="form-label">Amount (excl. GST)</label><input class="form-input" placeholder="₹0.00"/></div><div class="form-group"><label class="form-label">GST Rate</label><select class="filter-select" style="width:100%;height:36px;"><option>18%</option><option>12%</option><option>5%</option></select></div></div>
+        <div class="form-row"><div class="form-group"><label class="form-label">Due Date</label><input class="form-input" type="date"/></div><div class="form-group"><label class="form-label">Reference</label><input class="form-input" placeholder="AUC-XXXX / SUB-XXXX"/></div></div>
+        <div style="display:flex;gap:10px;margin-top:8px;"><button class="tb-btn primary">Create & Send Invoice</button><button class="tb-btn">Save as Draft</button></div>
+      </div></div></div>
+      <div id="inv-overdue" style="display:none;"><div class="alert alert-red"><span class="alert-icon">⚠</span><div class="alert-body"><strong>5 overdue invoices totalling ₹9,70,000.</strong> Send reminders or escalate to account managers.</div></div>
+      <div class="card"><div class="card-header"><span class="card-title">Overdue Invoices</span><button class="tb-btn primary">📧 Send Reminders</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Invoice #</th><th>Company</th><th>Amount</th><th>Due Date</th><th>Days Overdue</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">INV-2044</td><td>RajSteel Pvt Ltd</td><td>₹3,60,000</td><td>2 Apr</td><td><span class="badge badge-red">-1 day</span></td><td><button class="tb-btn">Send Reminder</button></td></tr>
+        <tr><td class="td-bold">INV-2038</td><td>OreLink Pvt Ltd</td><td>₹1,20,000</td><td>25 Mar</td><td><span class="badge badge-red">7 days</span></td><td><button class="tb-btn">Escalate</button></td></tr>
+        <tr><td class="td-bold">INV-2034</td><td>NovaMetal Corp</td><td>₹44,000</td><td>20 Mar</td><td><span class="badge badge-red">12 days</span></td><td><button class="tb-btn">Escalate</button></td></tr>
+      </tbody></table></div></div>
+      </div>
+      <div id="inv-credit" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Credit Notes</span><button class="tb-btn primary">+ Issue Credit Note</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Credit Note #</th><th>Against Invoice</th><th>Company</th><th>Amount</th><th>Reason</th><th>Date</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">CN-0088</td><td>INV-2031</td><td>SteelVault Ltd</td><td>₹18,000</td><td>Service downtime credit</td><td>28 Mar</td></tr>
+        <tr><td class="td-bold">CN-0087</td><td>INV-2025</td><td>CopperLine Ltd</td><td>₹8,500</td><td>Billing correction</td><td>22 Mar</td></tr>
+      </tbody></table></div></div></div>
+    </div>
+
+    <!-- ═══════════════════════════════ USER MANAGEMENT ═══════════════════════════════ -->
+    <div id="screen-users" class="screen">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ User Management</span></div>
+        <h1>User Financial Management</h1>
+        <p>Financial profiles, credit limits, wallets and payment method compliance</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Active Users<div class="stat-icon si-amber">👥</div></div><div class="stat-value">1,247</div><div class="stat-delta up">▲ 28 this month</div></div>
+        <div class="stat-card"><div class="stat-label">KYC Verified<div class="stat-icon si-green">✓</div></div><div class="stat-value">1,189</div><div class="stat-delta up">95.3%</div></div>
+        <div class="stat-card"><div class="stat-label">Payment Defaults<div class="stat-icon si-red">!</div></div><div class="stat-value">14</div><div class="stat-delta down">₹52 L at risk</div></div>
+        <div class="stat-card"><div class="stat-label">Wallet Balance (Total)<div class="stat-icon si-blue">👛</div></div><div class="stat-value">₹4.8 Cr</div><div class="stat-delta neutral">Across all users</div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'usr-profiles')">Financial Profiles</div>
+        <div class="tab" onclick="switchTab(this,'usr-credit')">Credit Limits</div>
+        <div class="tab" onclick="switchTab(this,'usr-wallet')">Wallet Management</div>
+        <div class="tab" onclick="switchTab(this,'usr-kyc')">KYC / Compliance</div>
+        <div class="tab" onclick="switchTab(this,'usr-payment')">Payment Methods</div>
+      </div>
+      <div id="usr-profiles">
+        <div class="filter-bar"><input class="filter-input" placeholder="🔍 Search user, company..."/><select class="filter-select"><option>All Roles</option><option>Buyer</option><option>Seller</option><option>Market Maker</option></select><select class="filter-select"><option>All Status</option><option>Active</option><option>Suspended</option><option>Flagged</option></select></div>
+        <div class="card"><div class="table-wrap"><table>
+          <thead><tr><th>Company</th><th>Role</th><th>Total Spend</th><th>Outstanding</th><th>Credit Limit</th><th>Risk</th><th>KYC</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td class="td-bold">RajSteel Pvt Ltd</td><td><span class="badge badge-amber">Buyer</span></td><td>₹4.2 Cr</td><td>₹3,60,000</td><td>₹10 Cr</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-green">Verified</span></td><td><div class="tbl-action">👁</div></td></tr>
+            <tr><td class="td-bold">Bharat Alloys</td><td><span class="badge badge-blue">Seller</span></td><td>₹8.8 Cr</td><td>—</td><td>₹5 Cr</td><td><span class="badge badge-green">Low</span></td><td><span class="badge badge-green">Verified</span></td><td><div class="tbl-action">👁</div></td></tr>
+            <tr><td class="td-bold">SteelVault Ltd</td><td><span class="badge badge-amber">Buyer</span></td><td>₹1.1 Cr</td><td>₹3,50,000</td><td>₹2 Cr</td><td><span class="badge badge-red">High</span></td><td><span class="badge badge-green">Verified</span></td><td><div class="tbl-action">👁</div></td></tr>
+            <tr><td class="td-bold">NovaMetal Corp</td><td><span class="badge badge-amber">Buyer</span></td><td>₹44 L</td><td>₹44,000</td><td>₹50 L</td><td><span class="badge badge-yellow">Medium</span></td><td><span class="badge badge-yellow">Pending</span></td><td><div class="tbl-action">👁</div></td></tr>
+          </tbody>
+        </table></div></div>
+      </div>
+      <div id="usr-credit" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Credit Limit Management</span></div><div class="table-wrap"><table><thead><tr><th>Company</th><th>Current Limit</th><th>Used</th><th>Available</th><th>Utilisation</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">RajSteel Pvt Ltd</td><td>₹10 Cr</td><td>₹4.2 Cr</td><td>₹5.8 Cr</td><td><div style="width:120px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:3px">42%</div><div class="progress-bar"><div class="progress-fill pf-green" style="width:42%"></div></div></div></td><td><button class="tb-btn">Adjust Limit</button></td></tr>
+        <tr><td class="td-bold">SteelVault Ltd</td><td>₹2 Cr</td><td>₹1.8 Cr</td><td>₹20 L</td><td><div style="width:120px"><div style="font-size:11px;color:var(--red);margin-bottom:3px">90%</div><div class="progress-bar"><div class="progress-fill pf-red" style="width:90%"></div></div></div></td><td><button class="tb-btn">Review</button></td></tr>
+      </tbody></table></div></div></div>
+      <div id="usr-wallet" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Wallet Balances</span></div><div class="table-wrap"><table><thead><tr><th>Company</th><th>Wallet Balance</th><th>Last Topup</th><th>Last Transaction</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">IndoChem Corp</td><td class="td-bold">₹2,45,000</td><td>30 Mar</td><td>1 Apr</td><td><span class="badge badge-green">Active</span></td></tr>
+        <tr><td class="td-bold">MetalCraft Inc</td><td class="td-bold">₹89,500</td><td>28 Mar</td><td>1 Apr</td><td><span class="badge badge-green">Active</span></td></tr>
+      </tbody></table></div></div></div>
+      <div id="usr-kyc" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">KYC & Compliance Status</span></div><div class="table-wrap"><table><thead><tr><th>Company</th><th>GST</th><th>PAN</th><th>Bank Account</th><th>Overall KYC</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">NovaMetal Corp</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-yellow">Pending</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-yellow">Incomplete</span></td><td><button class="tb-btn">Send Reminder</button></td></tr>
+        <tr><td class="td-bold">OreLink Pvt Ltd</td><td><span class="badge badge-red">Missing</span></td><td><span class="badge badge-red">Missing</span></td><td><span class="badge badge-red">Failed</span></td><td><span class="badge badge-red">Non-Compliant</span></td><td><button class="tb-btn">Suspend</button></td></tr>
+      </tbody></table></div></div></div>
+      <div id="usr-payment" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Payment Method Registry</span></div><div class="card-body"><div class="alert alert-blue"><span class="alert-icon">ℹ</span><div class="alert-body"><strong>Payment Method Verification</strong> All registered bank accounts and UPI handles are verified against KYC documents before activation.</div></div></div></div></div>
+    </div>
+
+    <!-- ═══════════════════════════════ DISPUTES ═══════════════════════════════ -->
+    <div id="screen-disputes" class="screen">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ Dispute Resolution</span></div>
+        <h1>Dispute Resolution</h1>
+        <p>Investigate financial disputes, manage settlements and track resolution timelines</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Open Disputes<div class="stat-icon si-red">⚖</div></div><div class="stat-value">9</div><div class="stat-delta down">₹1.2 Cr disputed</div></div>
+        <div class="stat-card"><div class="stat-label">Under Investigation<div class="stat-icon si-blue">🔍</div></div><div class="stat-value">4</div><div class="stat-delta neutral">—</div></div>
+        <div class="stat-card"><div class="stat-label">Resolved MTD<div class="stat-icon si-green">✓</div></div><div class="stat-value">12</div><div class="stat-delta up">₹88 L settled</div></div>
+        <div class="stat-card"><div class="stat-label">Avg Resolution Time<div class="stat-icon si-amber">⏱</div></div><div class="stat-value">6.4 days</div><div class="stat-delta up">▼ vs 8.1 last month</div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'dis-open')">Open Disputes (9)</div>
+        <div class="tab" onclick="switchTab(this,'dis-investigate')">Under Investigation</div>
+        <div class="tab" onclick="switchTab(this,'dis-settlement')">Settlements</div>
+        <div class="tab" onclick="switchTab(this,'dis-analytics')">Dispute Analytics</div>
+      </div>
+      <div id="dis-open">
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Dispute ID</th><th>Raised By</th><th>Against</th><th>Auction</th><th>Amount</th><th>Type</th><th>Raised On</th><th>Priority</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td class="td-bold">DIS-0041</td><td>IndoChem Corp</td><td>SteelVault Ltd</td><td>AUC-4872</td><td class="td-bold">₹5,00,000</td><td>EMD Non-Release</td><td>31 Mar</td><td><span class="badge badge-red">High</span></td><td><div class="tbl-actions"><div class="tbl-action">👁</div><div class="tbl-action">✎</div></div></td></tr>
+                <tr><td class="td-bold">DIS-0040</td><td>PrimeOre Exports</td><td>Platform</td><td>AUC-4865</td><td class="td-bold">₹1,00,000</td><td>Overcharged Commission</td><td>30 Mar</td><td><span class="badge badge-yellow">Medium</span></td><td><div class="tbl-actions"><div class="tbl-action">👁</div><div class="tbl-action">✎</div></div></td></tr>
+                <tr><td class="td-bold">DIS-0039</td><td>Bharat Alloys</td><td>MetalCraft Inc</td><td>AUC-4855</td><td class="td-bold">₹3,75,000</td><td>Payment Dispute</td><td>28 Mar</td><td><span class="badge badge-red">High</span></td><td><div class="tbl-actions"><div class="tbl-action">👁</div><div class="tbl-action">✎</div></div></td></tr>
+                <tr><td class="td-bold">DIS-0038</td><td>CopperLine Ltd</td><td>Platform</td><td>—</td><td class="td-bold">₹22,000</td><td>Invoice Discrepancy</td><td>27 Mar</td><td><span class="badge badge-green">Low</span></td><td><div class="tbl-actions"><div class="tbl-action">👁</div><div class="tbl-action">✎</div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="dis-investigate" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Disputes Under Investigation</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Dispute ID</th><th>Case Summary</th><th>Investigator</th><th>Evidence Status</th><th>Next Action</th><th>Deadline</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">DIS-0041</td><td>EMD not released 15 days post auction close</td><td>Priya R.</td><td><span class="badge badge-yellow">Partial</span></td><td>Bank statement review</td><td><span class="badge badge-red">3 Apr</span></td></tr>
+        <tr><td class="td-bold">DIS-0039</td><td>Payment bounce — cheque return</td><td>Priya R.</td><td><span class="badge badge-green">Complete</span></td><td>Hearing on 17 Apr</td><td><span class="badge badge-blue">17 Apr</span></td></tr>
+      </tbody></table></div></div></div>
+      <div id="dis-settlement" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Financial Settlements</span><span class="card-action">+ Record Settlement</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Dispute ID</th><th>Settlement Amount</th><th>Settled By</th><th>Date</th><th>Mode</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">DIS-0037</td><td>₹2,10,000</td><td>Mutual Agreement</td><td>26 Mar</td><td>NEFT</td><td><span class="badge badge-green">Closed</span></td></tr>
+        <tr><td class="td-bold">DIS-0035</td><td>₹60,000</td><td>Platform Arbitration</td><td>20 Mar</td><td>Wallet Debit</td><td><span class="badge badge-green">Closed</span></td></tr>
+      </tbody></table></div></div></div>
+      <div id="dis-analytics" style="display:none;">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">EMD Disputes</div><div class="stat-value">44%</div><div class="stat-delta down">Most common</div></div>
+          <div class="stat-card"><div class="stat-label">Invoice Disputes</div><div class="stat-value">22%</div><div class="stat-delta neutral">—</div></div>
+          <div class="stat-card"><div class="stat-label">Commission Disputes</div><div class="stat-value">18%</div><div class="stat-delta neutral">—</div></div>
+          <div class="stat-card"><div class="stat-label">Payment Disputes</div><div class="stat-value">16%</div><div class="stat-delta up">▲ increasing</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ REPORTS & MIS ═══════════════════════════════ -->
+    <div id="screen-reports" class="screen">
+      <div class="page-header">
+        <div class="breadcrumb">Finance Portal <span>/ Reports & Analysis (MIS)</span></div>
+        <h1>Reports & Analysis (MIS)</h1>
+        <p>Generate financial reports, revenue analysis and management information system outputs</p>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'rep-mis')">MIS Dashboard</div>
+        <div class="tab" onclick="switchTab(this,'rep-revenue')">Revenue Reports</div>
+        <div class="tab" onclick="switchTab(this,'rep-emd')">EMD Reports</div>
+        <div class="tab" onclick="switchTab(this,'rep-aging')">Aging Analysis</div>
+        <div class="tab" onclick="switchTab(this,'rep-custom')">Custom Reports</div>
+        <div class="tab" onclick="switchTab(this,'rep-export')">Export Centre</div>
+      </div>
+      <div id="rep-mis">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Total Revenue FY26<div class="stat-icon si-amber">₹</div></div><div class="stat-value">₹21.4 Cr</div><div class="stat-delta up">▲ 31% vs FY25</div></div>
+          <div class="stat-card"><div class="stat-label">Gross Profit FY26<div class="stat-icon si-green">↑</div></div><div class="stat-value">₹14.2 Cr</div><div class="stat-delta up">66.4% margin</div></div>
+          <div class="stat-card"><div class="stat-label">Total Transactions FY26<div class="stat-icon si-blue">⇄</div></div><div class="stat-value">34,821</div><div class="stat-delta up">▲ 44%</div></div>
+          <div class="stat-card"><div class="stat-label">Active Tenants<div class="stat-icon si-amber">🏢</div></div><div class="stat-value">1,247</div><div class="stat-delta up">▲ 22%</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Revenue by Stream — FY26</span></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-secondary)">Subscription Revenue</span><span style="color:var(--text-primary);font-weight:600">₹9.84 Cr (46%)</span></div><div class="progress-bar"><div class="progress-fill pf-amber" style="width:46%"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-secondary)">Transaction Commission</span><span style="color:var(--text-primary);font-weight:600">₹5.14 Cr (24%)</span></div><div class="progress-bar"><div class="progress-fill pf-blue" style="width:24%"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-secondary)">Advertisement Revenue</span><span style="color:var(--text-primary);font-weight:600">₹3.42 Cr (16%)</span></div><div class="progress-bar"><div class="progress-fill pf-green" style="width:16%"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-secondary)">EMD Forfeiture</span><span style="color:var(--text-primary);font-weight:600">₹3.00 Cr (14%)</span></div><div class="progress-bar"><div class="progress-fill pf-red" style="width:14%"></div></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Key MIS Metrics — April 2026</span></div>
+            <div class="card-body">
+              <div class="info-row"><span class="info-key">Days Sales Outstanding (DSO)</span><span class="info-val">18.4 days</span></div>
+              <div class="info-row"><span class="info-key">Collection Efficiency</span><span class="info-val" style="color:var(--green)">94.7%</span></div>
+              <div class="info-row"><span class="info-key">Bad Debt Ratio</span><span class="info-val" style="color:var(--red)">0.8%</span></div>
+              <div class="info-row"><span class="info-key">EMD Forfeiture Rate</span><span class="info-val">3.2%</span></div>
+              <div class="info-row"><span class="info-key">Dispute Resolution Rate</span><span class="info-val" style="color:var(--green)">87.5%</span></div>
+              <div class="info-row"><span class="info-key">Subscription Churn Rate</span><span class="info-val">2.1%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="rep-revenue" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Revenue Report</span><div style="display:flex;gap:8px;"><select class="filter-select"><option>FY 2025–26</option><option>FY 2024–25</option></select><button class="tb-btn primary">⬇ Export</button></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Month</th><th>Subscription</th><th>Commission</th><th>Ads</th><th>Forfeiture</th><th>Total</th><th>Growth</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">Apr 2026</td><td>₹84.6 L</td><td>₹44.2 L</td><td>₹31.4 L</td><td>₹22.1 L</td><td class="td-bold">₹1.84 Cr</td><td><span class="badge badge-green">▲14.2%</span></td></tr>
+        <tr><td class="td-bold">Mar 2026</td><td>₹78.2 L</td><td>₹41.1 L</td><td>₹26.6 L</td><td>₹15.5 L</td><td class="td-bold">₹1.61 Cr</td><td><span class="badge badge-green">▲8.7%</span></td></tr>
+        <tr><td class="td-bold">Feb 2026</td><td>₹72.1 L</td><td>₹38.8 L</td><td>₹22.0 L</td><td>₹15.0 L</td><td class="td-bold">₹1.48 Cr</td><td><span class="badge badge-green">▲6.5%</span></td></tr>
+      </tbody></table></div></div></div>
+      <div id="rep-emd" style="display:none;">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Total EMD Collected FY26</div><div class="stat-value">₹142 Cr</div></div>
+          <div class="stat-card"><div class="stat-label">Total Refunded FY26</div><div class="stat-value">₹132 Cr</div></div>
+          <div class="stat-card"><div class="stat-label">Total Forfeited FY26</div><div class="stat-value">₹1.8 Cr</div></div>
+          <div class="stat-card"><div class="stat-label">Currently Held</div><div class="stat-value">₹6.32 Cr</div></div>
+        </div>
+      </div>
+      <div id="rep-aging" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Accounts Receivable Aging</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Bucket</th><th>No. of Invoices</th><th>Amount</th><th>% of AR</th></tr></thead>
+      <tbody>
+        <tr><td class="td-bold">0–30 days</td><td>34</td><td>₹22.6 L</td><td><div class="progress-bar" style="width:100px"><div class="progress-fill pf-green" style="width:70%"></div></div></td></tr>
+        <tr><td class="td-bold">31–60 days</td><td>8</td><td>₹6.2 L</td><td><div class="progress-bar" style="width:100px"><div class="progress-fill pf-amber" style="width:20%"></div></div></td></tr>
+        <tr><td class="td-bold">61–90 days</td><td>4</td><td>₹2.9 L</td><td><div class="progress-bar" style="width:100px"><div class="progress-fill pf-red" style="width:9%"></div></div></td></tr>
+        <tr><td class="td-bold">90+ days</td><td>1</td><td>₹60,000</td><td><div class="progress-bar" style="width:100px"><div class="progress-fill pf-red" style="width:2%"></div></div></td></tr>
+      </tbody></table></div></div></div>
+      <div id="rep-custom" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Custom Report Builder</span></div><div class="card-body">
+        <div class="form-row"><div class="form-group"><label class="form-label">Report Type</label><select class="filter-select" style="width:100%;height:36px;"><option>Revenue Summary</option><option>Transaction Log</option><option>EMD Position</option><option>Subscription Ledger</option><option>GST Summary</option></select></div><div class="form-group"><label class="form-label">Date Range</label><select class="filter-select" style="width:100%;height:36px;"><option>This Month</option><option>Last Quarter</option><option>FY 2025–26</option><option>Custom</option></select></div></div>
+        <div style="display:flex;gap:10px;margin-top:4px;"><button class="tb-btn primary">📊 Generate Report</button><button class="tb-btn">⬇ Export as Excel</button><button class="tb-btn">⬇ Export as PDF</button></div>
+      </div></div></div>
+      <div id="rep-export" style="display:none;"><div class="card"><div class="card-header"><span class="card-title">Export Centre</span></div><div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+        <div class="qa-btn"><div class="qa-icon">📊</div><div class="qa-label">Revenue Report (Excel)</div></div>
+        <div class="qa-btn"><div class="qa-icon">🧾</div><div class="qa-label">Invoice Ledger (PDF)</div></div>
+        <div class="qa-btn"><div class="qa-icon">🔒</div><div class="qa-label">EMD Position (CSV)</div></div>
+        <div class="qa-btn"><div class="qa-icon">⇄</div><div class="qa-label">Transaction Log (CSV)</div></div>
+        <div class="qa-btn"><div class="qa-icon">📈</div><div class="qa-label">MIS Pack (Excel)</div></div>
+        <div class="qa-btn"><div class="qa-icon">🇮🇳</div><div class="qa-label">GST Summary (Excel)</div></div>
+      </div></div></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+  const titles = {
+    'dashboard': ['Dashboard', '— April 2026 Overview'],
+    'calendar': ['My Calendar', '— Scheduled Events'],
+    'emd-refund': ['EMD Refunds', '— Pending Approvals'],
+    'emd-tracking': ['EMD Tracking', '— Active Holdings'],
+    'subscription': ['Subscription Management', '— Active Plans'],
+    'advertisement': ['Advertisement Management', '— Campaigns'],
+    'transactions': ['Transactions', '— All Activity'],
+    'invoices': ['Invoice Management', '— Billing'],
+    'users': ['User Management', '— Financial Profiles'],
+    'disputes': ['Dispute Resolution', '— Open Cases'],
+    'reports': ['Reports & MIS', '— FY 2025–26']
+  };
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    const t = titles[id] || [id, ''];
+    document.getElementById('topbar-title').textContent = t[0];
+    document.getElementById('topbar-sub').textContent = t[1];
+    // highlight nav
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) n.classList.add('active');
+    });
+  }
+
+  function switchTab(el, targetId) {
+    const tabContainer = el.closest('.tabs');
+    tabContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    const screenEl = el.closest('.screen');
+    // hide all sibling div-tab-content
+    const allDivs = screenEl.querySelectorAll(':scope > .content > div, :scope > div');
+    // find all tab-content siblings by id pattern
+    const tabDivs = screenEl.querySelectorAll('[id]');
+    tabDivs.forEach(d => {
+      if(d.id !== 'emd-r-pending' && d.id !== 'emd-r-approved' && d.id !== 'emd-r-bulk' && d.id !== 'emd-r-history'
+        && d.id !== 'emd-t-active' && d.id !== 'emd-t-forfeit' && d.id !== 'emd-t-adjust' && d.id !== 'emd-t-report'
+        && d.id !== 'cal-month' && d.id !== 'cal-agenda' && d.id !== 'cal-reminders' && d.id !== 'cal-due'
+        && d.id !== 'sub-active' && d.id !== 'sub-renew' && d.id !== 'sub-upgrade' && d.id !== 'sub-payment' && d.id !== 'sub-analytics'
+        && d.id !== 'ad-campaigns' && d.id !== 'ad-spend' && d.id !== 'ad-invoices' && d.id !== 'ad-credits'
+        && d.id !== 'txn-all' && d.id !== 'txn-failed' && d.id !== 'txn-recon' && d.id !== 'txn-export'
+        && d.id !== 'inv-all' && d.id !== 'inv-create' && d.id !== 'inv-overdue' && d.id !== 'inv-credit'
+        && d.id !== 'usr-profiles' && d.id !== 'usr-credit' && d.id !== 'usr-wallet' && d.id !== 'usr-kyc' && d.id !== 'usr-payment'
+        && d.id !== 'dis-open' && d.id !== 'dis-investigate' && d.id !== 'dis-settlement' && d.id !== 'dis-analytics'
+        && d.id !== 'rep-mis' && d.id !== 'rep-revenue' && d.id !== 'rep-emd' && d.id !== 'rep-aging' && d.id !== 'rep-custom' && d.id !== 'rep-export'
+      ) return;
+      d.style.display = 'none';
+    });
+    const target = document.getElementById(targetId);
+    if (target) target.style.display = '';
+  }
+</script>
+</body>
+</html>
